@@ -1,20 +1,26 @@
 ﻿var box;
+var topBorder = 24.5;
+var botBorder = -20.5;
+var direction = new THREE.Vector3();
 clock = new THREE.Clock();
 clock.start();
 
 function init() {
     var scene = new THREE.Scene();
 
+    //create the starting direction  https://threejs.org/editor/
+    RandomBallDirection();
+
     //Variable
     //Speed of the ball
-    ballSpeed = 0.1;
+    ballSpeed = 1;
     currentTime = 0;
     oldTime = 0;
 
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
-    player = getBox(1, 4.5, 1);
-    enemy = getBox(1, 4.5, 1);
-    ball = getSphere(0.2);
+    player = getBox(1, 4.5, 0.3);
+    enemy = getBox(1, 4.5, 0.3);
+    ball = getSphere(0.4);
     var plane = getPlane(20);
     var directionalLight = getDirectionalLight(1);
     var helper = new THREE.CameraHelper(directionalLight.shadow.camera);
@@ -23,9 +29,9 @@ function init() {
     plane.name = 'plane-1';
 
     //Position of the elements
-    player.position.x = 13;
+    player.position.x = 33;
     player.position.y = 2;
-    enemy.position.x = -13;
+    enemy.position.x = -33;
     enemy.position.y = 2;
 
     ball.position.x = 0;
@@ -45,7 +51,7 @@ function init() {
     scene.add(helper);
 
     //Settings of the camera
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(140, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.y = 2;
     camera.position.z = 10;
 
@@ -76,23 +82,23 @@ document.addEventListener("keyup", keyUpHandler2, false);
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "q") {
         upPressed = true;
     }
 
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "d") {
         downPressed = true;
     }
 }
 
 function keyUpHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "q") {
         upPressed = false;
     }
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "d") {
         downPressed = false;
     }
 }
@@ -202,8 +208,8 @@ function update(myRenderer, myScene, myCamera) {
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
 
-    //Ball movement
-    ball.position.x += ballSpeed;
+    //Ball movement  https://threejs.org/editor/
+    BallMovement();
     console.log("actual speed: " + ballSpeed);
 
     //Get plane to use it
@@ -234,30 +240,54 @@ function update(myRenderer, myScene, myCamera) {
             oldTime = currentTime;
 
             ballSpeed = ballSpeed * (-1);
-
+            RandomBallDirection()
             //console.log(ballSpeed);
             //console.log("Hit Collision = ");
         }
     }
 
+
     //Movement direction when clicked (by Jaber)
-    speed = 0.2;
-    if (upPressed && enemy.position.y < 7.5) {
-        enemy.position.y += speed;
-    }
-    else if (downPressed && enemy.position.y > -3.5) {
-        enemy.position.y -= speed;
-    }
-    if (upPressed2 && player.position.y < 7.5) {
-        player.position.y += speed;
-    }
-    else if (downPressed2 && player.position.y > -3.5) {
-        player.position.y -= speed;
-    }
+    speed = 1.4;
+    PlayerMovement();
+    EnemyMovement();
+    
     requestAnimationFrame(function () {
         update(myRenderer, myScene, myCamera);
     })
 }
 
+function PlayerMovement() {
+    if (upPressed && enemy.position.y < topBorder) {
+        enemy.position.y += speed;
+    }
+    else if (downPressed && enemy.position.y > botBorder) {
+        enemy.position.y -= speed;
+    }
+}
+
+function EnemyMovement() {
+    if (upPressed2 && player.position.y < topBorder) {
+        player.position.y += speed;
+    }
+    else if (downPressed2 && player.position.y > botBorder) {
+        player.position.y -= speed;
+    }
+}
+
+function BallMovement() {
+    if (ball.position.y < botBorder || ball.position.y > topBorder) direction.y = - direction.y;
+    ball.translateX(direction.x * ballSpeed);
+    ball.translateY(direction.y * ballSpeed);
+}
+
+function RandomBallDirection() {
+    direction.x = Math.random() + 0.5;
+    direction.y = Math.random();
+    direction.normalize();
+}
+
+
 
 var myScene = init();
+
