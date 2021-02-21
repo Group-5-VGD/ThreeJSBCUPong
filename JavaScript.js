@@ -1,18 +1,21 @@
 ﻿var box;
+var topBorder = 24.5;
+var botBorder = -20.5;
+var direction = new THREE.Vector3();
 clock = new THREE.Clock();
 clock.start();
 
 function init() {
     var scene = new THREE.Scene();
 
+    //create the starting direction  https://threejs.org/editor/
+    RandomBallDirection();
+
     //Variable
     //Speed of the ball
-    ballSpeed = 1.6;
+    ballSpeed = 1;
     currentTime = 0;
     oldTime = 0;
-    playerScore = 0;
-    enemyScore = 0;
-
 
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
     player = getBox(1, 4.5, 0.3);
@@ -79,23 +82,23 @@ document.addEventListener("keyup", keyUpHandler2, false);
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "q") {
         upPressed = true;
     }
 
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "d") {
         downPressed = true;
     }
 }
 
 function keyUpHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "q") {
         upPressed = false;
     }
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "d") {
         downPressed = false;
     }
 }
@@ -195,7 +198,6 @@ function getDirectionalLight(intensity) {
     return light;
 }
 
-
 //Update function that runs every frame
 function update(myRenderer, myScene, myCamera) {
     myRenderer.render(
@@ -203,35 +205,11 @@ function update(myRenderer, myScene, myCamera) {
         myCamera,
     );
 
-    //Respawn the ball
-    if (ball.position.x < -85) {
-        enemyScore++;
-        console.log("goal for enemy: " + enemyScore);
-        document.getElementById("enemyScore").innerHTML = enemyScore;
-        ball.position.x = 0;
-    }
-    else if (ball.position.x > 85) {
-        playerScore++;
-        console.log("goal for player: " + playerScore);
-        document.getElementById("playerScore").innerHTML = playerScore;
-        ball.position.x = 0;
-    }
-
-    if (enemyScore >= 2) {
-        console.log("enemy won!");
-        document.getElementById("messageGame").innerHTML = "You lose!";
-        ballSpeed = 0;
-    }
-    else if (playerScore >= 2) {
-        console.log("player won!");
-        document.getElementById("messageGame").innerHTML = "You win!";
-        ballSpeed = 0;
-    }
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
 
-    //Ball movement
-    ball.position.x += ballSpeed;
+    //Ball movement  https://threejs.org/editor/
+    BallMovement();
     console.log("actual speed: " + ballSpeed);
 
     //Get plane to use it
@@ -257,36 +235,59 @@ function update(myRenderer, myScene, myCamera) {
         //console.log("Time: " + clock.getElapsedTime());
         //console.log("Delta Time: " + deltaTimeCol);
 
-        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && deltaTimeCol > 0.5 ) {
+        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && deltaTimeCol > 1 ) {
             // Collision detected:
             oldTime = currentTime;
 
             ballSpeed = ballSpeed * (-1);
-
+            RandomBallDirection()
             //console.log(ballSpeed);
             //console.log("Hit Collision = ");
         }
     }
 
+
     //Movement direction when clicked (by Jaber)
     speed = 1.4;
-    if (upPressed && enemy.position.y < 24.5) {
-        enemy.position.y += speed;
-    }
-    else if (downPressed && enemy.position.y > -20.5) {
-        enemy.position.y -= speed;
-    }
-    if (upPressed2 && player.position.y < 24.5) {
-        player.position.y += speed;
-    }
-    else if (downPressed2 && player.position.y > -20.5) {
-        player.position.y -= speed;
-    }
+    PlayerMovement();
+    EnemyMovement();
+    
     requestAnimationFrame(function () {
         update(myRenderer, myScene, myCamera);
     })
-
-
 }
 
+function PlayerMovement() {
+    if (upPressed && enemy.position.y < topBorder) {
+        enemy.position.y += speed;
+    }
+    else if (downPressed && enemy.position.y > botBorder) {
+        enemy.position.y -= speed;
+    }
+}
+
+function EnemyMovement() {
+    if (upPressed2 && player.position.y < topBorder) {
+        player.position.y += speed;
+    }
+    else if (downPressed2 && player.position.y > botBorder) {
+        player.position.y -= speed;
+    }
+}
+
+function BallMovement() {
+    if (ball.position.y < botBorder || ball.position.y > topBorder) direction.y = - direction.y;
+    ball.translateX(direction.x * ballSpeed);
+    ball.translateY(direction.y * ballSpeed);
+}
+
+function RandomBallDirection() {
+    direction.x = Math.random() + 0.5;
+    direction.y = Math.random();
+    direction.normalize();
+}
+
+
+
 var myScene = init();
+
