@@ -13,9 +13,16 @@ function init() {
 
     //Variable
     //Speed of the ball
-    ballSpeed = 1;
+<<<<<<< HEAD
+    ballSpeed = 1.6;
+=======
+   
+>>>>>>> thea
     currentTime = 0;
     oldTime = 0;
+    playerScore = 0;
+    enemyScore = 0;
+
 
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
     player = getBox(1, 4.5, 0.3);
@@ -198,6 +205,7 @@ function getDirectionalLight(intensity) {
     return light;
 }
 
+
 //Update function that runs every frame
 function update(myRenderer, myScene, myCamera) {
     myRenderer.render(
@@ -205,6 +213,30 @@ function update(myRenderer, myScene, myCamera) {
         myCamera,
     );
 
+    //Respawn the ball
+    if (ball.position.x < -85) {
+        enemyScore++;
+        console.log("goal for enemy: " + enemyScore);
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        ball.position.x = 0;
+    }
+    else if (ball.position.x > 85) {
+        playerScore++;
+        console.log("goal for player: " + playerScore);
+        document.getElementById("playerScore").innerHTML = playerScore;
+        ball.position.x = 0;
+    }
+
+    if (enemyScore >= 2) {
+        console.log("enemy won!");
+        document.getElementById("messageGame").innerHTML = "You lose!";
+        ballSpeed = 0;
+    }
+    else if (playerScore >= 2) {
+        console.log("player won!");
+        document.getElementById("messageGame").innerHTML = "You win!";
+        ballSpeed = 0;
+    }
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
 
@@ -235,7 +267,7 @@ function update(myRenderer, myScene, myCamera) {
         //console.log("Time: " + clock.getElapsedTime());
         //console.log("Delta Time: " + deltaTimeCol);
 
-        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && deltaTimeCol > 1 ) {
+        if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && deltaTimeCol > 0.5 ) {
             // Collision detected:
             oldTime = currentTime;
 
@@ -249,6 +281,7 @@ function update(myRenderer, myScene, myCamera) {
 
     //Movement direction when clicked (by Jaber)
     speed = 1.4;
+
     PlayerMovement();
     EnemyMovement();
     
@@ -274,6 +307,7 @@ function EnemyMovement() {
         player.position.y -= speed;
     }
 }
+>>>>>>> thea
 
 function BallMovement() {
     if (ball.position.y < botBorder || ball.position.y > topBorder) direction.y = - direction.y;
@@ -288,6 +322,8 @@ function RandomBallDirection() {
 }
 
 
+
+}
 
 var myScene = init();
 
