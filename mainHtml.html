@@ -1,6 +1,8 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style type="text/css">
         html, body {
             margin: 0;
@@ -8,11 +10,50 @@
             overflow;
             hidden
         }
+
+        #playerScore {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 170px;
+            position: absolute;
+            top: 150px;
+            width: 70%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+        }
+
+        #enemyScore {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 170px;
+            position: absolute;
+            top: 150px;
+            width: 130%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+        }
+        
+        #messageGame {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 170px;
+            position: absolute;
+            top: 400px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <div id="playerScore">0</div>
+    <div id="enemyScore">0</div>
+    <div id="messageGame"></div>
+
     <div id="webgl"></div>
     <script src="three.js"></script>
+    <script src="fonts/droid_serif_bold.typeface.js"></script>
+    <script src="threex.text.js"></script>
     <script src="JavaScript.js"></script>
 </body>
 </html>
