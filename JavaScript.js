@@ -1,4 +1,6 @@
-﻿var box;
+﻿
+
+var box;
 var topBorder = 38;
 var botBorder = -34;
 var direction = new THREE.Vector3();
@@ -14,6 +16,8 @@ function init() {
     //Variable
     //Speed of the ball
 
+    scoreWin = 3;
+    gameFinished = false;
     ballReset = true;
     ballSpeed = 1.6;
 
@@ -23,8 +27,14 @@ function init() {
     enemyScore = 0;
 
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
-    player = getBox(1, 4.5, 0.3);
-    enemy = getBox(1, 4.5, 0.3);
+    player = getBox(1, 4.5, 2);
+    enemy = getBox(1, 4.5, 2);
+
+    powerup1 = getBox(3, 2, 1);
+    powerup2 = getBox(3, 2, 1);
+    powerup3 = getBox(3, 2, 1);
+    powerup4 = getBox(3, 2, 1);
+
     ball = getSphere(0.6);
     var directionalLight = getDirectionalLight(1);
     var directionalLight2 = getDirectionalLight(1);
@@ -56,9 +66,12 @@ function init() {
     plane.name = 'plane-1';
 
     //Position of the elements
+    player.scale.y = 1.1;
     player.position.x = 40;
     player.position.y = 2;
     player.position.z = 0;
+
+    enemy.scale.y = 1.1;
     enemy.position.x = -40;
     enemy.position.y = 2;
     enemy.position.z = 0;
@@ -66,6 +79,25 @@ function init() {
     ball.position.x = 0;
     ball.position.y = 2;
     ball.position.z = 0;
+
+    //Power Ups
+
+    powerup1.material.color.setHex(0xff0000);
+    powerup2.material.color.setHex(0xff0000);
+    powerup3.material.color.setHex(0xff0000);
+    powerup4.material.color.setHex(0xff0000);
+
+    powerup1.position.x = 20;
+    powerup1.position.y = 15;
+
+    powerup2.position.x = -20;
+    powerup2.position.y = 15;
+
+    powerup3.position.x = 20;
+    powerup3.position.y = -15;
+
+    powerup4.position.x = -20;
+    powerup4.position.y = -15;
 
     //Planes to make the line in the middle of the screen
     plane.position.y = 0;
@@ -107,6 +139,13 @@ function init() {
     scene.add(ball);
     scene.add(directionalLight);
     scene.add(directionalLight2);
+
+    //Power Ups
+    scene.add(powerup1);
+    scene.add(powerup2);
+    scene.add(powerup3);
+    scene.add(powerup4);
+
     //Planes to make the line in the middle of the screen
     scene.add(plane);
     scene.add(plane2);
@@ -140,6 +179,17 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor('rgb(0, 0, 0)');
     document.getElementById("webgl").appendChild(renderer.domElement);
+
+
+
+    //Very basic conditional to play the sound when 'A' is pressed, just to test it was working
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode == 65) {
+            sound = new Audio("bim.ogg");
+            sound.play();
+            console.log("Played.");
+        }
+    });
 
     update(renderer, scene, camera);
 
@@ -289,34 +339,55 @@ function update(myRenderer, myScene, myCamera) {
         enemyScore++;
         document.getElementById("enemyScore").innerHTML = enemyScore;
         ballReset = false;
-        setTimeout(function () {
-            ball.position.x = 0;
-            ball.position.y = 0;
-            RandomBallDirection();
-            ballSpeed = ballSpeed * (-1);
-            ballReset = true;
-        }, 1500);
+        if (enemyScore < scoreWin)
+        {
+            sound = new Audio("Sounds/dead.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                ball.position.x = 0;
+                ball.position.y = 0;
+                RandomBallDirection();
+                ballSpeed = ballSpeed * (-1);
+                ballReset = true;
+            }, 1500);
+        }
+        else {
+            sound = new Audio("Sounds/lose.mp3");
+            sound.play();
+        }
     }
     else if (ball.position.x > 75 && ballReset) {
+        
         playerScore++;
         document.getElementById("playerScore").innerHTML = playerScore;
         ballReset = false;
-        setTimeout(function ()
-        {
-            ball.position.x = 0;
-            ball.position.y = 0;
-            RandomBallDirection();
-            ballSpeed = ballSpeed * (-1);
-            ballReset = true;
-        }, 1500);
+        if (playerScore < scoreWin) {
+            sound = new Audio("Sounds/dead.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                ball.position.x = 0;
+                ball.position.y = 0;
+                RandomBallDirection();
+                ballSpeed = ballSpeed * (-1);
+                ballReset = true;
+            }, 1500);
+        }
+        else {
+            sound = new Audio("Sounds/win.mp3");
+            sound.play();
+        }
     }
 
-    if (enemyScore >= 5) {
+    if (enemyScore >= scoreWin) {
+        gameFinished = true;
         document.getElementById("messageGame").innerHTML = "You Lose!";
         ballSpeed = 0;
         ball.position.y = 100;
     }
-    else if (playerScore >= 5) {
+    else if (playerScore >= scoreWin) {
+        gameFinished = true;
         document.getElementById("messageGame").innerHTML = "You Win!";
         ballSpeed = 0;
         ball.position.y = 100;
@@ -333,6 +404,7 @@ function update(myRenderer, myScene, myCamera) {
 
     //Collision
     var collidableMeshList = [player, enemy];
+    var collidablePowerUp = [powerup1, powerup2, powerup3, powerup4];
     var originPoint = ball.position.clone();
 
     for (var vertexIndex = 0; vertexIndex < ball.geometry.vertices.length; vertexIndex++) {
@@ -343,6 +415,7 @@ function update(myRenderer, myScene, myCamera) {
 
         var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
         var collisionResults = ray.intersectObjects(collidableMeshList);
+        var collisionResultsPowerUp = ray.intersectObjects(collidablePowerUp);
 
         deltaTimeCol = currentTime - oldTime;
 
@@ -359,7 +432,52 @@ function update(myRenderer, myScene, myCamera) {
             //console.log(ballSpeed);
             //console.log("Hit Collision = ");
         }
+
+        if (collisionResultsPowerUp.length > 0 && collisionResultsPowerUp[0].distance <= directionVector.length() ) {
+            // Collision detected with a powerup:
+            if (ballSpeed > 0) {
+                player.scale.y = 0.5;
+                player.material.color.setHex(0x00ff00);
+
+                powerup1.material.color.setHex(0x00ff00);
+                powerup2.material.color.setHex(0x00ff00);
+                powerup3.material.color.setHex(0x00ff00);
+                powerup4.material.color.setHex(0x00ff00);
+                setTimeout(function () {
+                    powerup1.material.color.setHex(0xff0000);
+                    powerup2.material.color.setHex(0xff0000);
+                    powerup3.material.color.setHex(0xff0000);
+                    powerup4.material.color.setHex(0xff0000);
+                    player.material.color.setHex(0xffffff);
+                }, 350);
+
+                setTimeout(function () {
+                    player.scale.y = 1.1;
+                }, 12000);
+            }
+            else if (ballSpeed < 0) {
+                enemy.scale.y = 0.5;
+                enemy.material.color.setHex(0x00ff00);
+
+                powerup1.material.color.setHex(0x00ff00);
+                powerup2.material.color.setHex(0x00ff00);
+                powerup3.material.color.setHex(0x00ff00);
+                powerup4.material.color.setHex(0x00ff00);
+                setTimeout(function () {
+                    powerup1.material.color.setHex(0xff0000);
+                    powerup2.material.color.setHex(0xff0000);
+                    powerup3.material.color.setHex(0xff0000);
+                    powerup4.material.color.setHex(0xff0000);
+                    enemy.material.color.setHex(0xffffff);
+                }, 350);
+
+                setTimeout(function () {
+                    enemy.scale.y = 1.1;
+                }, 12000);
+            }
+        }
     }
+
 
     PlayerMovement();
     EnemyMovement();
@@ -403,15 +521,23 @@ function EnemyMovement() {
 }
 
 function BallMovement() {
-    if (ball.position.y < botBorder || ball.position.y > topBorder) direction.y = - direction.y;
+    if (ball.position.y < botBorder || ball.position.y > topBorder && gameFinished == false)
+    {
+        direction.y = - direction.y;
+        sound = new Audio("Sounds/touchWall.mp3");
+        sound.play();
+    }
     ball.translateX(direction.x * ballSpeed);
     ball.translateY(direction.y * ballSpeed);
+    
 }
 
 function RandomBallDirection() {
     direction.x = Math.random() + 0.5;
     direction.y = Math.random();
     direction.normalize();
+    sound = new Audio("Sounds/collision.mp3");
+    sound.play();
 }
 
 var myScene = init();
