@@ -13,11 +13,9 @@ function init() {
 
     //Variable
     //Speed of the ball
-<<<<<<< HEAD
+
     ballSpeed = 1.6;
-=======
-   
->>>>>>> thea
+
     currentTime = 0;
     oldTime = 0;
     playerScore = 0;
@@ -89,23 +87,23 @@ document.addEventListener("keyup", keyUpHandler2, false);
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "q") {
+    if (e.key == "d") {
         upPressed = true;
     }
 
     //Hotkey to go down is "q"
-    else if (e.key == "d") {
+    else if (e.key == "q") {
         downPressed = true;
     }
 }
 
 function keyUpHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "q") {
+    if (e.key == "d") {
         upPressed = false;
     }
     //Hotkey to go down is "q"
-    else if (e.key == "d") {
+    else if (e.key == "q") {
         downPressed = false;
     }
 }
@@ -307,7 +305,6 @@ function EnemyMovement() {
         player.position.y -= speed;
     }
 }
->>>>>>> thea
 
 function BallMovement() {
     if (ball.position.y < botBorder || ball.position.y > topBorder) direction.y = - direction.y;
@@ -322,8 +319,6 @@ function RandomBallDirection() {
 }
 
 
-
-}
 
 var myScene = init();
 
