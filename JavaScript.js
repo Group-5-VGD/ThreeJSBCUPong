@@ -242,21 +242,22 @@ function update(myRenderer, myScene, myCamera) {
 
     //Movement direction when clicked (by Jaber)
     speed = 0.2;
-    if (upPressed) {
+    if (upPressed && enemy.position.y < 7.5) {
         enemy.position.y += speed;
     }
-    else if (downPressed) {
+    else if (downPressed && enemy.position.y > -3.5) {
         enemy.position.y -= speed;
     }
-    if (upPressed2) {
+    if (upPressed2 && player.position.y < 7.5) {
         player.position.y += speed;
     }
-    else if (downPressed2) {
+    else if (downPressed2 && player.position.y > -3.5) {
         player.position.y -= speed;
     }
     requestAnimationFrame(function () {
         update(myRenderer, myScene, myCamera);
     })
 }
+
 
 var myScene = init();
