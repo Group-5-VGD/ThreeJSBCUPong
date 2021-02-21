@@ -7,7 +7,7 @@ function init() {
 
     //Variable
     //Speed of the ball
-    ballSpeed = 0.5;
+    ballSpeed = 0.1;
     currentTime = 0;
     oldTime = 0;
 
@@ -66,9 +66,13 @@ var keyState = {};
 
 var upPressed = false;
 var downPressed = false;
+var upPressed2 = false;
+var downPressed2 = false;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("keydown", keyDownHandler2, false);
+document.addEventListener("keyup", keyUpHandler2, false);
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
@@ -90,6 +94,29 @@ function keyUpHandler(e) {
     //Hotkey to go down is "q"
     else if (e.key == "q") {
         downPressed = false;
+    }
+}
+
+function keyDownHandler2(e) {
+    //Hotkey to go up is "d"
+    if (e.keyCode == "38") {
+        upPressed2 = true;
+    }
+
+    //Hotkey to go down is "q"
+    else if (e.keyCode == "40") {
+        downPressed2 = true;
+    }
+}
+
+function keyUpHandler2(e) {
+    //Hotkey to go up is "d"
+    if (e.keyCode == "38") {
+        upPressed2 = false;
+    }
+    //Hotkey to go down is "q"
+    else if (e.keyCode == "40") {
+        downPressed2 = false;
     }
 }
 
@@ -214,16 +241,22 @@ function update(myRenderer, myScene, myCamera) {
     }
 
     //Movement direction when clicked (by Jaber)
-    speed = 0.4;
+    speed = 0.2;
     if (upPressed) {
         enemy.position.y += speed;
     }
     else if (downPressed) {
         enemy.position.y -= speed;
     }
-
+    if (upPressed2) {
+        player.position.y += speed;
+    }
+    else if (downPressed2) {
+        player.position.y -= speed;
+    }
     requestAnimationFrame(function () {
         update(myRenderer, myScene, myCamera);
     })
 }
+
 var myScene = init();
