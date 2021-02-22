@@ -1,6 +1,4 @@
-﻿
-
-var box;
+﻿var box;
 var topBorder = 38;
 var botBorder = -34;
 var direction = new THREE.Vector3();
@@ -52,31 +50,44 @@ function init() {
     var directionalLight = getDirectionalLight(1);
     var directionalLight2 = getDirectionalLight(1);
 
-    //Planes to make the line in the middle of the screen
-    var plane = getPlane(0.35, 2);
-    var plane2 = getPlane(0.35, 2);
-    var plane3 = getPlane(0.35, 2);
-    var plane4 = getPlane(0.35, 2);
-    var plane5 = getPlane(0.35, 2);
-    var plane6 = getPlane(0.35, 2);
-    var plane7 = getPlane(0.35, 2);
-    var plane8 = getPlane(0.35, 2);
-    var plane9 = getPlane(0.35, 2);
-    var plane10 = getPlane(0.35, 2);
-    var plane11 = getPlane(0.35, 2);
-    var plane12 = getPlane(0.35, 2);
-    var plane13 = getPlane(0.35, 2);
-    var plane14 = getPlane(0.35, 2);
-    var plane15 = getPlane(0.35, 2);
-    var plane16 = getPlane(0.35, 2);
-    var plane17 = getPlane(0.35, 2);
-    var plane18 = getPlane(0.35, 2);
-    var plane19 = getPlane(0.35, 2);
-    var plane20 = getPlane(0.35, 2);
-    var plane21 = getPlane(0.35, 2);
+    var TopPlanes = new Array();
+    var BotPlanes = new Array();
 
     //Give name to my name to access it outside init()
-    plane.name = 'plane-1';
+    TopPlanes.name = 'plane-1';
+    BotPlanes.name = 'plane-1';
+
+
+    //Planes to make the line in the middle of the screen
+    //var plane = getPlane(0.35, 2);
+    //var plane2 = getPlane(0.35, 2);
+    //var plane3 = getPlane(0.35, 2);
+    //var plane4 = getPlane(0.35, 2);
+    //var plane5 = getPlane(0.35, 2);
+    //var plane6 = getPlane(0.35, 2);
+    //var plane7 = getPlane(0.35, 2);
+    //var plane8 = getPlane(0.35, 2);
+    //var plane9 = getPlane(0.35, 2);
+    //var plane10 = getPlane(0.35, 2);
+    //var plane11 = getPlane(0.35, 2);
+    //var plane12 = getPlane(0.35, 2);
+    //var plane13 = getPlane(0.35, 2);
+    //var plane14 = getPlane(0.35, 2);
+    //var plane15 = getPlane(0.35, 2);
+    //var plane16 = getPlane(0.35, 2);
+    //var plane17 = getPlane(0.35, 2);
+    //var plane18 = getPlane(0.35, 2);
+    //var plane19 = getPlane(0.35, 2);
+    //var plane20 = getPlane(0.35, 2);
+    //var plane21 = getPlane(0.35, 2);
+
+    for (var i = 0; i < 11; i++) {
+        TopPlanes[i] = getPlane(0.35, 2);
+    }
+    for (var i = 0; i < 11; i++) {
+        BotPlanes[i] = getPlane(0.35, 2);
+    }
+
 
     //Position of the elements
     player.scale.y = 1.1;
@@ -113,28 +124,36 @@ function init() {
     powerup4.position.y = -15;
 
     //Planes to make the line in the middle of the screen
-    plane.position.y = 0;
-    plane2.position.y = 4;
-    plane3.position.y = 8;
-    plane4.position.y = 12;
-    plane5.position.y = 16;
-    plane6.position.y = 20;
-    plane7.position.y = 24;
-    plane8.position.y = 28;
-    plane9.position.y = 32;
-    plane10.position.y = 36;
-    plane21.position.y = 40;
+    //plane.position.y = 0;
+    //plane2.position.y = 4;
+    //plane3.position.y = 8;
+    //plane4.position.y = 12;
+    //plane5.position.y = 16;
+    //plane6.position.y = 20;
+    //plane7.position.y = 24;
+    //plane8.position.y = 28;
+    //plane9.position.y = 32;
+    //plane10.position.y = 36;
+    //plane21.position.y = 40;
 
-    plane11.position.y = -4;
-    plane12.position.y = -8;
-    plane13.position.y = -12;
-    plane14.position.y = -16;
-    plane15.position.y = -20;
-    plane16.position.y = -24;
-    plane17.position.y = -28;
-    plane18.position.y = -32;
-    plane19.position.y = -36;
-    plane20.position.y = -40;
+    //plane11.position.y = -4;
+    //plane12.position.y = -8;
+    //plane13.position.y = -12;
+    //plane14.position.y = -16;
+    //plane15.position.y = -20;
+    //plane16.position.y = -24;
+    //plane17.position.y = -28;
+    //plane18.position.y = -32;
+    //plane19.position.y = -36;
+    //plane20.position.y = -40;
+
+    for (var i = 0; i < 11; i++) {
+        TopPlanes[i].position.y = i * 4;
+    }
+
+    for (var i = 1; i < 11; i++) {
+        BotPlanes[i].position.y = i * -4;
+    }
 
     directionalLight.position.y = 30;
     directionalLight.position.z = 35;
@@ -160,27 +179,32 @@ function init() {
     scene.add(powerup4);
 
     //Planes to make the line in the middle of the screen
-    scene.add(plane);
-    scene.add(plane2);
-    scene.add(plane3);
-    scene.add(plane4);
-    scene.add(plane5);
-    scene.add(plane6);
-    scene.add(plane7);
-    scene.add(plane8);
-    scene.add(plane9);
-    scene.add(plane10);
-    scene.add(plane11);
-    scene.add(plane12);
-    scene.add(plane13);
-    scene.add(plane14);
-    scene.add(plane15);
-    scene.add(plane16);
-    scene.add(plane17);
-    scene.add(plane18);
-    scene.add(plane19);
-    scene.add(plane20);
-    scene.add(plane21);
+    //scene.add(plane);
+    //scene.add(plane2);
+    //scene.add(plane3);
+    //scene.add(plane4);
+    //scene.add(plane5);
+    //scene.add(plane6);
+    //scene.add(plane7);
+    //scene.add(plane8);
+    //scene.add(plane9);
+    //scene.add(plane10);
+    //scene.add(plane11);
+    //scene.add(plane12);
+    //scene.add(plane13);
+    //scene.add(plane14);
+    //scene.add(plane15);
+    //scene.add(plane16);
+    //scene.add(plane17);
+    //scene.add(plane18);
+    //scene.add(plane19);
+    //scene.add(plane20);
+    //scene.add(plane21);
+
+    for (var i = 0; i < 11; i++) {
+        scene.add(TopPlanes[i]);
+        scene.add(BotPlanes[i]);
+    }
 
     //Settings of the camera
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
@@ -203,6 +227,8 @@ function init() {
             console.log("Played.");
         }
     });
+
+    StartCountdown();
 
     update(renderer, scene, camera);
 
@@ -370,7 +396,7 @@ function update(myRenderer, myScene, myCamera) {
             InitStateLevel01();
             PlayerMovement();
             AIMovement();
-            BallMovement(); //Ball movement  https://threejs.org/editor/
+            setTimeout(BallMovement, 1500);
             break;
         case "Level02":
             InitStateLevel02();
@@ -389,82 +415,7 @@ function update(myRenderer, myScene, myCamera) {
 
     //Respawn the ball
 
-    //Player Lose
-    if (ball.position.x < -75 && ballReset) {
-        enemyScore++;
-        document.getElementById("enemyScore").innerHTML = enemyScore;
-        ballReset = false;
-        if (enemyScore < scoreWin)
-        {
-            sound = new Audio("Sounds/dead.mp3");
-            sound.play();
-
-            setTimeout(function () {
-                blockInvicible = true;
-                ball.position.x = 0;
-                ball.position.y = 0;
-                RandomBallDirection();
-                ballSpeed = ballSpeed * (-1);
-                ballReset = true;
-
-                setTimeout(function () {
-                    blockInvicible = false;
-                }, 300);
-            }, 1500);
-        }
-        else if (enemyScore >= scoreWin)
-        {
-            document.getElementById("messageGame").innerHTML = "You Lose!";
-            sound = new Audio("Sounds/lose.mp3");
-            sound.play();
-
-            setTimeout(function () {
-                currentState = states[0];
-            }, 4000);
-        }
-    }
-    //Player Win
-    else if (ball.position.x > 75 && ballReset) {
-        
-        playerScore++;
-        document.getElementById("playerScore").innerHTML = playerScore;
-        ballReset = false;
-        if (playerScore < scoreWin) {
-            sound = new Audio("Sounds/dead.mp3");
-            sound.play();
-
-            setTimeout(function () {
-                ball.position.x = 0;
-                ball.position.y = 0;
-                RandomBallDirection();
-                ballSpeed = ballSpeed * (-1);
-                ballReset = true;
-            }, 1500);
-        }
-        else if (playerScore >= scoreWin)
-        {
-            document.getElementById("messageGame").innerHTML = "You Win!";
-            sound = new Audio("Sounds/win.mp3");
-            sound.play();
-
-            if (currentState == states[1]) {
-                setTimeout(function () {
-                    currentState = states[2];
-                }, 5500);
-            }
-            else if (currentState == states[2]) {
-                setTimeout(function () {
-                    currentState = states[3];
-                }, 5500);
-            }
-            else if (currentState == states[3])
-            {
-                setTimeout(function () {
-                    currentState = states[0];
-                }, 5500);
-            }
-        }
-    }
+    CheckIfGameOver();
 
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
@@ -813,6 +764,90 @@ function RandomBallDirection() {
     direction.normalize();
     sound = new Audio("Sounds/collision.mp3");
     sound.play();
+}
+
+function StartCountdown() {
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "3"; }, 1000);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "2"; }, 1500);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "1"; }, 2000);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "Start"; }, 3000);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = " "; }, 4000);
+}
+
+function CheckIfGameOver()
+{
+    //Player Lose
+    if (ball.position.x < -75 && ballReset) {
+        enemyScore++;
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        ballReset = false;
+        if (enemyScore < scoreWin) {
+            sound = new Audio("Sounds/dead.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                blockInvicible = true;
+                ball.position.x = 0;
+                ball.position.y = 0;
+                RandomBallDirection();
+                ballSpeed = ballSpeed * (-1);
+                ballReset = true;
+
+                setTimeout(function () {
+                    blockInvicible = false;
+                }, 300);
+            }, 1500);
+        }
+        else if (enemyScore >= scoreWin) {
+            document.getElementById("messageGame").innerHTML = "You Lose!";
+            sound = new Audio("Sounds/lose.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                currentState = states[0];
+            }, 4000);
+        }
+    }
+    //Player Win
+    else if (ball.position.x > 75 && ballReset) {
+
+        playerScore++;
+        document.getElementById("playerScore").innerHTML = playerScore;
+        ballReset = false;
+        if (playerScore < scoreWin) {
+            sound = new Audio("Sounds/dead.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                ball.position.x = 0;
+                ball.position.y = 0;
+                RandomBallDirection();
+                ballSpeed = ballSpeed * (-1);
+                ballReset = true;
+            }, 1500);
+        }
+        else if (playerScore >= scoreWin) {
+            document.getElementById("messageGame").innerHTML = "You Win!";
+            sound = new Audio("Sounds/win.mp3");
+            sound.play();
+
+            if (currentState == states[1]) {
+                setTimeout(function () {
+                    currentState = states[2];
+                }, 5500);
+            }
+            else if (currentState == states[2]) {
+                setTimeout(function () {
+                    currentState = states[3];
+                }, 5500);
+            }
+            else if (currentState == states[3]) {
+                setTimeout(function () {
+                    currentState = states[0];
+                }, 5500);
+            }
+        }
+    }
 }
 
 var myScene = init();
