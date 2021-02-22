@@ -51,13 +51,31 @@
             text-align: center;
             z-index: 100;
             display: block;
+
+
+        }
+
+        #menuImage {
+            position: absolute;
+            z-index: 110;
+            margin: 0;
+            padding 0;
+            display: grid;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
         }
     </style>
 </head>
 <body>
+
+
     <div id="playerScore">0</div>
     <div id="enemyScore">0</div>
     <div id="messageGame"></div>
+
+    <img id="menuImage" src="startMenu.png" />
 
     <div id="webgl"></div>
     <script src="three.js"></script>

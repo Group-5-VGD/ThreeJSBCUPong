@@ -15,6 +15,11 @@ function init() {
 
     //Variable
     //Speed of the ball
+    blockInvicible = false;
+    menuGone = false;
+
+    states = ["Menu", "Level01", "Level02", "Level03", "Level04"];
+    currentState = states[0];
 
     scoreWin = 3;
     gameFinished = false;
@@ -29,6 +34,7 @@ function init() {
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
     player = getBox(1, 4.5, 2);
     enemy = getBox(1, 4.5, 2);
+    block = getBox(1, 20, 2);
 
     powerup1 = getBox(3, 2, 1);
     powerup2 = getBox(3, 2, 1);
@@ -75,6 +81,10 @@ function init() {
     enemy.position.x = -40;
     enemy.position.y = 2;
     enemy.position.z = 0;
+
+    block.position.x = 0;
+    block.position.y = 6;
+    block.position.z = 0;
 
     ball.position.x = 0;
     ball.position.y = 2;
@@ -136,6 +146,7 @@ function init() {
     //Add elements to the scene
     scene.add(player);
     scene.add(enemy);
+    scene.add(block);
     scene.add(ball);
     scene.add(directionalLight);
     scene.add(directionalLight2);
@@ -199,15 +210,25 @@ function init() {
 //Movement (By Jaber)
 var keyState = {};
 
+var upPressedMenu = false;
 var upPressed = false;
 var downPressed = false;
 var upPressed2 = false;
 var downPressed2 = false;
 
+document.addEventListener("keydown", keyDownHandlerMenu, false);
+
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("keydown", keyDownHandler2, false);
 document.addEventListener("keyup", keyUpHandler2, false);
+
+function keyDownHandlerMenu(e) {
+    //Hotkey to start game is "Enter"
+    if (e.keyCode == "32") {
+        upPressedMenu = true;
+    }
+}
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
@@ -350,6 +371,11 @@ function update(myRenderer, myScene, myCamera) {
                 RandomBallDirection();
                 ballSpeed = ballSpeed * (-1);
                 ballReset = true;
+                blockInvicible = true;
+                
+                setTimeout(function () {
+                    blockInvicible = false;
+                }, 300);
             }, 1500);
         }
         else {
@@ -395,15 +421,40 @@ function update(myRenderer, myScene, myCamera) {
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
 
-    //Ball movement  https://threejs.org/editor/
-    BallMovement();
-    console.log("actual speed: " + ballSpeed);
+
+    //Finite State Machine
+    console.log(currentState);
+
+    switch (currentState) {
+        case "Menu":
+            StartGame();
+            break;
+        case "Level01":
+            PlayerMovement();
+            //EnemyMovement();
+            BlockMovement();
+            AIMovement();
+            BallMovement(); //Ball movement  https://threejs.org/editor/
+            break;
+        case "Level02":
+            PlayerMovement();
+            //EnemyMovement();
+            AIMovement();
+            BallMovement(); //Ball movement  https://threejs.org/editor/
+            break;
+    }
+
 
     //Get plane to use it
     var plane = myScene.getObjectByName('plane-1');
 
     //Collision
-    var collidableMeshList = [player, enemy];
+    if (blockInvicible == false) {
+        var collidableMeshList = [player, enemy, block];
+    }
+    else {
+        var collidableMeshList = [player, enemy];
+    }
     var collidablePowerUp = [powerup1, powerup2, powerup3, powerup4];
     var originPoint = ball.position.clone();
 
@@ -478,27 +529,65 @@ function update(myRenderer, myScene, myCamera) {
         }
     }
 
-
-    PlayerMovement();
-    EnemyMovement();
-    //Vs AI
-    //AIMovement();
-
     requestAnimationFrame(function () {
         update(myRenderer, myScene, myCamera);
     })
 }
 
+//Click Enter to Start Game
+function StartGame()
+{
+    if (upPressedMenu)
+    {
+        if (menuGone == false) {
+            menuGone = true;
+
+            document.getElementById("menuImage").style.display = "none";
+            sound = new Audio("Sounds/enterGame.mp3");
+            sound.play();
+
+            setTimeout(function () {
+                currentState = states[1];
+            }, 1500);
+        }
+    }
+}
+
+
 //Movement direction when clicked (by Jaber)
 speed = 2;
 
-//Vs AI
-/*
+//Vs AI Movement
 function AIMovement() {
-    //enemy.position.y += speed;
-    player.position.y = ball.position.y;   
+    AISpeed = 0.8;
+    if ((ball.position.y - player.position.y) > 0.5 && ball.position.y < 38) {
+        player.position.y += AISpeed;
+    }
+    else if ((player.position.y - ball.position.y) > 0.5 && ball.position.y > -34) {
+        player.position.y -= AISpeed;
+    }
+    else if (ball.position.y > 38 || ball.position.y < -34) {}
+    else
+    {
+        player.position.y = ball.position.y;  //It's a perfect AI 
+    }
 }
-*/
+
+//Block Movement
+function BlockMovement() {
+    BlockSpeed = 0.2;
+    if ((ball.position.y - block.position.y) > 0.5 && ball.position.y < 38) {
+        block.position.y += BlockSpeed;
+    }
+    else if ((block.position.y - ball.position.y) > 0.5 && ball.position.y > -34) {
+        block.position.y -= BlockSpeed;
+    }
+    else if (ball.position.y > 38 || ball.position.y < -34) { }
+    else {
+        block.position.y = ball.position.y;  //It's a perfect AI 
+    }
+}
+
 
 //2 players
 function PlayerMovement() {
@@ -509,7 +598,6 @@ function PlayerMovement() {
         enemy.position.y -= speed;
     }
 }
-
 
 function EnemyMovement() {
     if (upPressed2 && player.position.y < topBorder) {
