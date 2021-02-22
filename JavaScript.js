@@ -13,6 +13,7 @@ function init() {
 
     //Variable
     //Speed of the ball
+    currentPlayerColor = 0xffffff;
 
     initMenuDone = false;
     initLevel01Done = false;
@@ -228,8 +229,6 @@ function init() {
         }
     });
 
-    StartCountdown();
-
     update(renderer, scene, camera);
 
     return scene;
@@ -396,7 +395,7 @@ function update(myRenderer, myScene, myCamera) {
             InitStateLevel01();
             PlayerMovement();
             AIMovement();
-            setTimeout(BallMovement, 1500);
+            BallMovement(); //Ball movement  https://threejs.org/editor/
             break;
         case "Level02":
             InitStateLevel02();
@@ -424,14 +423,18 @@ function update(myRenderer, myScene, myCamera) {
     var plane = myScene.getObjectByName('plane-1');
 
     //Collision
-    if (currentState == states[1] || currentState == states[0]) {
+    if (currentState == states[1] || currentState == states[0])
+    {
         var collidableMeshList = [player, enemy];
     }
-    else {
-        if (blockInvicible == false) {
+    else
+    {
+        if (blockInvicible == false)
+        {
             var collidableMeshList = [player, enemy, block];
         }
-        else {
+        else if (blockInvicible)
+        {
             var collidableMeshList = [player, enemy];
         }
     }
@@ -481,7 +484,7 @@ function update(myRenderer, myScene, myCamera) {
                     powerup2.material.color.setHex(0xff0000);
                     powerup3.material.color.setHex(0xff0000);
                     powerup4.material.color.setHex(0xff0000);
-                    player.material.color.setHex(0xffffff);
+                    player.material.color.setHex(currentPlayerColor);
                 }, 350);
 
                 setTimeout(function () {
@@ -531,7 +534,7 @@ function StartGame()
             menuGone = true;
 
             setTimeout(function () {
-                currentState = states[1];
+                currentState = states[1];//bug
                 upPressedMenu = false;
             }, 1500);
         }
@@ -557,12 +560,18 @@ function InitStateMenu()
         document.getElementById("messageGame").innerHTML = "";
         document.getElementById("menuImage").style.display = "inline";
 
+        //Player Design (it's actually the enemy)
+        currentPlayerColor = 0xffffff;
+        player.material.color.setHex(currentPlayerColor);
+        player.scale.y = 1.1;
+        player.scale.x = 1.3;
+
         player.position.y = 0;
         enemy.position.y = 0;
 
         scene.remove(block);
         
-        scoreWin = 3;
+        //scoreWin = 3;
         //ballReset = true;
         ball.position.y = 0;
         ball.position.x = 0;
@@ -593,12 +602,18 @@ function InitStateLevel01()
         document.getElementById("playerScore").innerHTML = playerScore;
         document.getElementById("messageGame").innerHTML = "";
 
+        //Player Design (it's actually the enemy)
+        currentPlayerColor = 0xffffff;
+        player.material.color.setHex(currentPlayerColor);
+        player.scale.y = 1.1;
+        player.scale.x = 1.3;
+
         player.position.y = 0;
         enemy.position.y = 0;
 
         scene.remove(block);
 
-        scoreWin = 2;
+        //scoreWin = 3;
         ballReset = true;
         ball.position.y = 0;
         ball.position.x = 0;
@@ -635,15 +650,21 @@ function InitStateLevel02()
         document.getElementById("playerScore").innerHTML = playerScore;
         document.getElementById("messageGame").innerHTML = "";
 
+        //Player Design (it's actually the enemy)
+        currentPlayerColor = 0x654321;
+        player.material.color.setHex(currentPlayerColor);
+        player.scale.y = 1.1;
+        player.scale.x = 2;
+
         player.position.y = 0;
         enemy.position.y = 0;
 
-        scoreWin = 2;
+        //scoreWin = 3;
         ballReset = true;
         ball.position.y = 0;
         ball.position.x = 0;
         ballSpeed = 1.8;
-        AISpeed = 1.1;
+        AISpeed = 1;
 
         currentTime = 0;
         oldTime = 0;
@@ -672,15 +693,24 @@ function InitStateLevel03() {
         document.getElementById("playerScore").innerHTML = playerScore;
         document.getElementById("messageGame").innerHTML = "";
 
+        //Player Design (it's actually the enemy)
+        currentPlayerColor = 0x696969;
+        player.material.color.setHex(currentPlayerColor);
+        player.scale.y = 1.1;
+        player.scale.x = 2;
+
+        player.scale.x = 2;
+        player.scale.y = 1.3;
+
         player.position.y = 0;
         enemy.position.y = 0;
 
-        scoreWin = 2;
+        //scoreWin = 3;
         ballReset = true;
         ball.position.y = 0;
         ball.position.x = 0;
         ballSpeed = 2;
-        AISpeed = 1.3;
+        AISpeed = 1.2;
         blockSpeed = 0.3;
 
         currentTime = 0;
@@ -755,7 +785,6 @@ function BallMovement() {
     }
     ball.translateX(direction.x * ballSpeed);
     ball.translateY(direction.y * ballSpeed);
-    
 }
 
 function RandomBallDirection() {
@@ -767,11 +796,10 @@ function RandomBallDirection() {
 }
 
 function StartCountdown() {
-    setTimeout(function () { document.getElementById("messageGame").innerHTML = "3"; }, 1000);
-    setTimeout(function () { document.getElementById("messageGame").innerHTML = "2"; }, 1500);
-    setTimeout(function () { document.getElementById("messageGame").innerHTML = "1"; }, 2000);
-    setTimeout(function () { document.getElementById("messageGame").innerHTML = "Start"; }, 3000);
-    setTimeout(function () { document.getElementById("messageGame").innerHTML = " "; }, 4000);
+    setTimeout(function () {document.getElementById("messageGame").innerHTML = "3"; sound = new Audio("Sounds/collision.mp3"); sound.play();}, 100);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "2"; sound = new Audio("Sounds/collision.mp3"); sound.play();}, 600);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = "1"; sound = new Audio("Sounds/collision.mp3"); sound.play();}, 1100);
+    setTimeout(function () { document.getElementById("messageGame").innerHTML = " "; }, 1600);
 }
 
 function CheckIfGameOver()
@@ -787,22 +815,22 @@ function CheckIfGameOver()
 
             setTimeout(function () {
                 blockInvicible = true;
+                ballSpeed = ballSpeed * (-1);
+                RandomBallDirection();
                 ball.position.x = 0;
                 ball.position.y = 0;
-                RandomBallDirection();
-                ballSpeed = ballSpeed * (-1);
                 ballReset = true;
 
                 setTimeout(function () {
                     blockInvicible = false;
-                }, 300);
+                }, 600);
             }, 1500);
         }
         else if (enemyScore >= scoreWin) {
             document.getElementById("messageGame").innerHTML = "You Lose!";
             sound = new Audio("Sounds/lose.mp3");
             sound.play();
-
+            
             setTimeout(function () {
                 currentState = states[0];
             }, 4000);
@@ -819,11 +847,16 @@ function CheckIfGameOver()
             sound.play();
 
             setTimeout(function () {
+                blockInvicible = true;
+                ballSpeed = ballSpeed * (-1);
+                RandomBallDirection();
                 ball.position.x = 0;
                 ball.position.y = 0;
-                RandomBallDirection();
-                ballSpeed = ballSpeed * (-1);
                 ballReset = true;
+
+                setTimeout(function () {
+                    blockInvicible = false;
+                }, 600);
             }, 1500);
         }
         else if (playerScore >= scoreWin) {
@@ -831,20 +864,32 @@ function CheckIfGameOver()
             sound = new Audio("Sounds/win.mp3");
             sound.play();
 
-            if (currentState == states[1]) {
+            if (currentState == states[1])
+            {
+                setTimeout(function ()
+                {
+                    document.getElementById("messageGame").innerHTML = "";
+                    StartCountdown();
+                    setTimeout(function () {
+                        currentState = states[2];
+                    }, 2000);
+                }, 5500);  
+            }
+            else if (currentState == states[2])
+            {
                 setTimeout(function () {
-                    currentState = states[2];
+                    document.getElementById("messageGame").innerHTML = "";
+                    StartCountdown();
+                    setTimeout(function () {
+                        currentState = states[3];
+                    }, 2000);
                 }, 5500);
             }
-            else if (currentState == states[2]) {
-                setTimeout(function () {
-                    currentState = states[3];
-                }, 5500);
-            }
-            else if (currentState == states[3]) {
+            else if (currentState == states[3])
+            {
                 setTimeout(function () {
                     currentState = states[0];
-                }, 5500);
+                }, 5000);
             }
         }
     }
