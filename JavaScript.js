@@ -8,21 +8,28 @@ clock = new THREE.Clock();
 clock.start();
 
 function init() {
-    var scene = new THREE.Scene();
+    scene = new THREE.Scene();
 
     //create the starting direction  https://threejs.org/editor/
     RandomBallDirection();
 
     //Variable
     //Speed of the ball
+
+    initMenuDone = false;
+    initLevel01Done = false;
+    initLevel02Done = false;
+    initLevel03Done = false;
+
     blockInvicible = false;
     menuGone = false;
+
+    gameFinished = false;
 
     states = ["Menu", "Level01", "Level02", "Level03", "Level04"];
     currentState = states[0];
 
-    scoreWin = 3;
-    gameFinished = false;
+    scoreWin = 2;
     ballReset = true;
     ballSpeed = 1.6;
 
@@ -34,7 +41,7 @@ function init() {
     //Create the elements (Use "var" to make it private, and use nothing to make it accessible everywhere)
     player = getBox(1, 4.5, 2);
     enemy = getBox(1, 4.5, 2);
-    block = getBox(1, 20, 2);
+    block = getBox(0, 0, 0);
 
     powerup1 = getBox(3, 2, 1);
     powerup2 = getBox(3, 2, 1);
@@ -81,10 +88,6 @@ function init() {
     enemy.position.x = -40;
     enemy.position.y = 2;
     enemy.position.z = 0;
-
-    block.position.x = 0;
-    block.position.y = 6;
-    block.position.z = 0;
 
     ball.position.x = 0;
     ball.position.y = 2;
@@ -146,7 +149,6 @@ function init() {
     //Add elements to the scene
     scene.add(player);
     scene.add(enemy);
-    scene.add(block);
     scene.add(ball);
     scene.add(directionalLight);
     scene.add(directionalLight2);
@@ -232,23 +234,23 @@ function keyDownHandlerMenu(e) {
 
 function keyDownHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "d" || e.key == "D") {
         upPressed = true;
     }
 
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "q" || e.key == "Q") {
         downPressed = true;
     }
 }
 
 function keyUpHandler(e) {
     //Hotkey to go up is "d"
-    if (e.key == "d") {
+    if (e.key == "d" || e.key == "D") {
         upPressed = false;
     }
     //Hotkey to go down is "q"
-    else if (e.key == "q") {
+    else if (e.key == "q" || e.key == "Q") {
         downPressed = false;
     }
 }
@@ -355,7 +357,39 @@ function update(myRenderer, myScene, myCamera) {
         myCamera,
     );
 
+    //Finite State Machine
+    //EnemyMovement();
+    console.log(currentState);
+
+    switch (currentState) {
+        case "Menu":
+            InitStateMenu();
+            StartGame();
+            break;
+        case "Level01":
+            InitStateLevel01();
+            PlayerMovement();
+            AIMovement();
+            BallMovement(); //Ball movement  https://threejs.org/editor/
+            break;
+        case "Level02":
+            InitStateLevel02();
+            PlayerMovement();
+            AIMovement();
+            BallMovement(); //Ball movement  https://threejs.org/editor/
+            break;
+        case "Level03":
+            InitStateLevel03();
+            BlockMovement();
+            PlayerMovement();
+            AIMovement();
+            BallMovement(); //Ball movement  https://threejs.org/editor/
+            break;
+    }
+
     //Respawn the ball
+
+    //Player Lose
     if (ball.position.x < -75 && ballReset) {
         enemyScore++;
         document.getElementById("enemyScore").innerHTML = enemyScore;
@@ -366,23 +400,30 @@ function update(myRenderer, myScene, myCamera) {
             sound.play();
 
             setTimeout(function () {
+                blockInvicible = true;
                 ball.position.x = 0;
                 ball.position.y = 0;
                 RandomBallDirection();
                 ballSpeed = ballSpeed * (-1);
                 ballReset = true;
-                blockInvicible = true;
-                
+
                 setTimeout(function () {
                     blockInvicible = false;
                 }, 300);
             }, 1500);
         }
-        else {
+        else if (enemyScore >= scoreWin)
+        {
+            document.getElementById("messageGame").innerHTML = "You Lose!";
             sound = new Audio("Sounds/lose.mp3");
             sound.play();
+
+            setTimeout(function () {
+                currentState = states[0];
+            }, 4000);
         }
     }
+    //Player Win
     else if (ball.position.x > 75 && ballReset) {
         
         playerScore++;
@@ -400,61 +441,51 @@ function update(myRenderer, myScene, myCamera) {
                 ballReset = true;
             }, 1500);
         }
-        else {
+        else if (playerScore >= scoreWin)
+        {
+            document.getElementById("messageGame").innerHTML = "You Win!";
             sound = new Audio("Sounds/win.mp3");
             sound.play();
+
+            if (currentState == states[1]) {
+                setTimeout(function () {
+                    currentState = states[2];
+                }, 5500);
+            }
+            else if (currentState == states[2]) {
+                setTimeout(function () {
+                    currentState = states[3];
+                }, 5500);
+            }
+            else if (currentState == states[3])
+            {
+                setTimeout(function () {
+                    currentState = states[0];
+                }, 5500);
+            }
         }
     }
 
-    if (enemyScore >= scoreWin) {
-        gameFinished = true;
-        document.getElementById("messageGame").innerHTML = "You Lose!";
-        ballSpeed = 0;
-        ball.position.y = 100;
-    }
-    else if (playerScore >= scoreWin) {
-        gameFinished = true;
-        document.getElementById("messageGame").innerHTML = "You Win!";
-        ballSpeed = 0;
-        ball.position.y = 100;
-    }
     //Delta (used for collision)
     currentTime = clock.getElapsedTime();
-
-
-    //Finite State Machine
-    console.log(currentState);
-
-    switch (currentState) {
-        case "Menu":
-            StartGame();
-            break;
-        case "Level01":
-            PlayerMovement();
-            //EnemyMovement();
-            BlockMovement();
-            AIMovement();
-            BallMovement(); //Ball movement  https://threejs.org/editor/
-            break;
-        case "Level02":
-            PlayerMovement();
-            //EnemyMovement();
-            AIMovement();
-            BallMovement(); //Ball movement  https://threejs.org/editor/
-            break;
-    }
-
 
     //Get plane to use it
     var plane = myScene.getObjectByName('plane-1');
 
     //Collision
-    if (blockInvicible == false) {
-        var collidableMeshList = [player, enemy, block];
-    }
-    else {
+    if (currentState == states[1] || currentState == states[0]) {
         var collidableMeshList = [player, enemy];
     }
+    else {
+        if (blockInvicible == false) {
+            var collidableMeshList = [player, enemy, block];
+        }
+        else {
+            var collidableMeshList = [player, enemy];
+        }
+    }
+    
+
     var collidablePowerUp = [powerup1, powerup2, powerup3, powerup4];
     var originPoint = ball.position.clone();
 
@@ -537,29 +568,182 @@ function update(myRenderer, myScene, myCamera) {
 //Click Enter to Start Game
 function StartGame()
 {
-    if (upPressedMenu)
-    {
-        if (menuGone == false) {
-            menuGone = true;
-
+    if (menuGone == false) {
+        if (upPressedMenu)
+        {
+            console.log("Space was pressed");
+            
             document.getElementById("menuImage").style.display = "none";
-            sound = new Audio("Sounds/enterGame.mp3");
+            sound = new Audio("Sounds/collision.mp3"); //Son Enter Game est nul
             sound.play();
+
+            menuGone = true;
 
             setTimeout(function () {
                 currentState = states[1];
+                upPressedMenu = false;
             }, 1500);
         }
     }
 }
 
+function InitStateMenu()
+{
+    initLevel01Done = false;
+    initLevel02Done = false;
+    initLevel03Done = false;
+
+    if (initMenuDone == false)
+    {
+        initMenuDone = true;
+        menuGone = false;
+        gameFinished = false;
+
+        enemyScore = 0;
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        playerScore = 0;
+        document.getElementById("playerScore").innerHTML = playerScore;
+        document.getElementById("messageGame").innerHTML = "";
+        document.getElementById("menuImage").style.display = "inline";
+
+        player.position.y = 0;
+        enemy.position.y = 0;
+
+        scene.remove(block);
+        
+        scoreWin = 3;
+        //ballReset = true;
+        ball.position.y = 0;
+        ball.position.x = 0;
+        ballSpeed = 1.6;
+        AISpeed = 0.8;
+
+        currentTime = 0;
+        oldTime = 0;
+    }
+}
+
+function InitStateLevel01()
+{
+    initMenuDone = false;
+    initLevel02Done = false;
+    initLevel03Done = false;
+
+    if (initLevel01Done == false)
+    {
+        initLevel01Done = true;
+
+        menuGone = true;
+        gameFinished = false;
+
+        enemyScore = 0;
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        playerScore = 0;
+        document.getElementById("playerScore").innerHTML = playerScore;
+        document.getElementById("messageGame").innerHTML = "";
+
+        player.position.y = 0;
+        enemy.position.y = 0;
+
+        scene.remove(block);
+
+        scoreWin = 2;
+        ballReset = true;
+        ball.position.y = 0;
+        ball.position.x = 0;
+        ballSpeed = 1.6;
+        AISpeed = 0.8;
+
+        currentTime = 0;
+        oldTime = 0;
+    }
+}
+
+function InitStateLevel02()
+{
+    initMenuDone = false;
+    initLevel01Done = false;
+    initLevel03Done = false;
+
+    if (initLevel02Done == false)
+    {
+        initLevel02Done = true;
+
+        //New Block for next level
+        scene.remove(block);
+        block = getBox(1, 20, 2);
+        block.position.y = -25;
+        scene.add(block);
+
+        menuGone = true;
+        gameFinished = false;
+
+        enemyScore = 0;
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        playerScore = 0;
+        document.getElementById("playerScore").innerHTML = playerScore;
+        document.getElementById("messageGame").innerHTML = "";
+
+        player.position.y = 0;
+        enemy.position.y = 0;
+
+        scoreWin = 2;
+        ballReset = true;
+        ball.position.y = 0;
+        ball.position.x = 0;
+        ballSpeed = 1.8;
+        AISpeed = 1.1;
+
+        currentTime = 0;
+        oldTime = 0;
+    }
+}
+
+function InitStateLevel03() {
+    initMenuDone = false;
+    initLevel01Done = false;
+    initLevel02Done = false;
+
+    if (initLevel03Done == false) {
+        initLevel03Done = true;
+
+        //New Block for next level
+        scene.remove(block);
+        block = getBox(1, 20, 2);
+        scene.add(block);
+        
+        menuGone = true;
+        gameFinished = false;
+
+        enemyScore = 0;
+        document.getElementById("enemyScore").innerHTML = enemyScore;
+        playerScore = 0;
+        document.getElementById("playerScore").innerHTML = playerScore;
+        document.getElementById("messageGame").innerHTML = "";
+
+        player.position.y = 0;
+        enemy.position.y = 0;
+
+        scoreWin = 2;
+        ballReset = true;
+        ball.position.y = 0;
+        ball.position.x = 0;
+        ballSpeed = 2;
+        AISpeed = 1.3;
+        blockSpeed = 0.3;
+
+        currentTime = 0;
+        oldTime = 0;
+    }
+}
+
 
 //Movement direction when clicked (by Jaber)
-speed = 2;
+AISpeed = 0.8;
 
 //Vs AI Movement
 function AIMovement() {
-    AISpeed = 0.8;
+
     if ((ball.position.y - player.position.y) > 0.5 && ball.position.y < 38) {
         player.position.y += AISpeed;
     }
@@ -574,13 +758,14 @@ function AIMovement() {
 }
 
 //Block Movement
+blockSpeed = 0.2;
+
 function BlockMovement() {
-    BlockSpeed = 0.2;
     if ((ball.position.y - block.position.y) > 0.5 && ball.position.y < 38) {
-        block.position.y += BlockSpeed;
+        block.position.y += blockSpeed;
     }
     else if ((block.position.y - ball.position.y) > 0.5 && ball.position.y > -34) {
-        block.position.y -= BlockSpeed;
+        block.position.y -= blockSpeed;
     }
     else if (ball.position.y > 38 || ball.position.y < -34) { }
     else {
@@ -590,6 +775,8 @@ function BlockMovement() {
 
 
 //2 players
+speed = 2;
+
 function PlayerMovement() {
     if (upPressed && enemy.position.y < topBorder) {
         enemy.position.y += speed;
